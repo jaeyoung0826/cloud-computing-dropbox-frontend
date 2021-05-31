@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "axios": "^0.21.1",
+    "material-design-icons-iconfont": "^6.1.0",
+    "node-pre-gyp": "^0.17.0",
+    "vue-axios-cors": "^1.0.1",
+    "vue-upload-component": "^2.8.22",
+    "vuex": "^3.6.2",
+    "vuex-persistedstate": "*"
+  }
+}
