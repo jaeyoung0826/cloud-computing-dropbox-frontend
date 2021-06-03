@@ -69,9 +69,10 @@ import Upload from './views/Page.vue'
     data: () => ({ 
     drawer: null,
     items: [
-          { title: '문서함', icon: 'mdi-clock-time-four ', to:'/main'},
-          { title: '공유저장소', icon: 'mdi-account-group',to:'/Share'},
-          { title: 'About', icon: 'mdi-help-box',to:'/about' },
+          { title: 'image', icon: 'mdi-clock-time-four ', to:'/main'},
+          { title: '중요문서함', icon: 'mdi-star',to:'/Star'},
+          { title: '최근문서함', icon: 'mdi-help-box',to:'/about' },
+          { title: '문서함', icon: 'mdi-help-box',to:'/test' },
           
         ],
         }),

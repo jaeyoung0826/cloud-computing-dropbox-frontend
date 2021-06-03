@@ -35,7 +35,6 @@ const routes = [
       if(store.state.access!=null)
       {
         next()
-        router.go(-1)
       }
       else{
         alert("비정상적인 접근입니다!")
@@ -47,9 +46,9 @@ const routes = [
   
   ,
   {
-    path: '/Share',
-    name: 'Share',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Share.vue'),
+    path: '/Star',
+    name: 'Star',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Star.vue'),
     beforeEnter: (to, from, next) => 
     {
       if(store.state.access!=null)
@@ -71,7 +70,7 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
+    component: () => import(/* webpackChunkName: "about" */ '../views/Recent.vue'),
     beforeEnter: (to, from, next) => 
     {
       if(store.state.access!=null)
@@ -83,8 +82,30 @@ const routes = [
       router.go(-1)
       }
       
+     },
+  
+  },
+  {
+    path: '/test',
+    name: 'test',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import(/* webpackChunkName: "about" */ '../views/Test.vue'),
+    beforeEnter: (to, from, next) => 
+    {
+      if(store.state.access!=null)
+      {
+        next()
+      }
+      else{
+      alert("비정상적인 접근입니다!")
+      router.go(-1)
+      }
+      
+     },
+  
   }
-}
 ]
 
 const router = new VueRouter({

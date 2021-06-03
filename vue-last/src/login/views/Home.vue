@@ -39,11 +39,9 @@
                       </v-card-text>
                       <div class="text-center mt-3">
                         <v-btn rounded color="teal accent-3" 
-                               dark v-on:click="login({email_login,password_login})"
-                          >     
+                               dark v-on:click="login({email_login,password_login})">
                           SIGN IN</v-btn>
                       </div>
-                      
                     </v-col>
                     <v-col cols="12" md="4" class="teal accent-3">
                       <v-card-text class="white--text mt-12">
@@ -82,7 +80,7 @@
                             color="teal accent-3"
                             single-line
                             outlined
-                            v-model="first_name"
+                            v-model="form.first_name"
                           />
                           </div>
                           <div style="width:100px">
@@ -96,7 +94,7 @@
                             color="teal accent-3"
                             single-line
                             outlined  
-                            v-model="last_name"
+                            v-model="form.last_name"
                           />
                           </div>
                           </v-row>
@@ -108,7 +106,7 @@
                             prepend-icon="person"
                             type="text"
                             color="teal accent-3"
-                            v-model="username"
+                            v-model="form.username"
                             single-line
                             outlined  
                           />
@@ -120,7 +118,7 @@
                             color="teal accent-3"
                             single-line
                             outlined  
-                            v-model="email"
+                            v-model="form.email"
                           />
                           </div>
                           
@@ -137,7 +135,7 @@
                             color="teal accent-3"
                             single-line
                             outlined  
-                            v-model="password"
+                            v-model="form.password"
                           />
                           </div>
 
@@ -153,26 +151,19 @@
                             color="teal accent-3"
                             single-line
                             outlined
-                            v-model="check_password"                            
+                            v-model="form.check_password"                            
                           />
                           </div>
                           </v-row>
                         
                         </v-form>
                       </v-card-text>
-                      <v-alert v-if="signok"
+                      <v-alert
                         :value="iserror"
                         type="success"
                       >
                       가입이 완료 되었습니다!
                       </v-alert>
-                      <v-alert v-if="signfalse"
-                        :value="iserror"
-                        type="success"
-                      >
-                      가입이 실패 되었습니다!
-                      </v-alert>
-                      
                       <div style="height:100px"></div>
                       <div class="text-center mt-n5 heightset">
                         <v-btn 
@@ -194,19 +185,23 @@
 
 <script>
 import axios from "axios"
-import {mapState,mapActions} from "vuex"
+import {mapActions} from "vuex"
 export default {
   data: () => ({
     step: 1,
-    state:mapState.can_access,
-    
+    form: {
+        username: '',
+        email: '',
+        password:'',
+        check_password:'',
+        first_name:'',
+        last_name:''
+    },
     login_form:{
       email:'',
       password:''
     },
-    iserror:false,
-    signok:false,
-    signfalse:false
+    iserror:false
   }),
   props: {
     source: String
@@ -217,20 +212,18 @@ export default {
         console.log( this.form),
         this.cleartxt(),
         this.iserror=true,
-        axios.post('http://localhost:8081/users/', {
-        username: this.username,
-        email: this.email,
-        password:this.password,
+        axios.post('/users', {
+        username: this.form.username,
+        email: this.form.email,
+        password:this.for.password,
         check_password:this.check_password,
         first_name:this.first_name,
         last_name:this.last_name
         }).then(function (response) {
           console.log(response);
-          alert("가입 완료")
         })
         .catch(function (error) {
-          console.log(error);
-          alert("가입 실패")
+        console.log(error);
          });
         },
       cleartxt(){this.form='', this.password_login=''},

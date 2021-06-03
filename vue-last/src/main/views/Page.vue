@@ -40,6 +40,7 @@
 
 <script>
 import Upload from "./Upload.vue";
+import {mapActions} from "vuex"
 export default {
   components: {
     Upload
@@ -48,11 +49,13 @@ export default {
     dialog: false,
   }),
   methods: {
+     ...mapActions(["refresh_token"]),
     openDialog() {
       this.dialog = true;
     },
     closeDialog() {
       this.dialog = false;
+      
     },
   }
 }

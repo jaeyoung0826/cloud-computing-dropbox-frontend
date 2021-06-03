@@ -17,7 +17,6 @@ const store= new Vuex.Store({
     access: null,
     userid:null,
     refresh:null,
-    can_access:false,
   },
   
   getters: {},
@@ -27,42 +26,45 @@ const store= new Vuex.Store({
       state.access=payload.access
       state.refresh=payload.refresh
     },
-    check_access(state)
+    
+    set_userid(state,payload)
     {
-      console.log(state.access)
+      state.userid=payload.email_login
+    },
+    reset_token(state,payload)
+    {
+      state.access=payload.access
     }
+   
   },
   actions: {
-    //로그인 시도
-    check({commit})
+    //토큰 재발급
+    refresh_token({commit,state})
     {
-      commit("check_access")
-    }
-    ,
+      axios.post("http://localhost:8081/users/login/refresh",{refresh:state.refresh})
+      .then( res=> {commit("reset_token",res)
+             console.log(res)       
+     })
+      .catch(err=>{alert(err)} )
+    },
+    //로그인 시도
    login({commit},signobj){
     {   
-        console.log(signobj)
-        axios.post('users/login/', {username:signobj.email_login,password:signobj.password_login})
+        commit("set_userid",signobj)
+        axios.post("http://localhost:8081/users/login/", {username:signobj.email_login,password:signobj.password_login})
          .then( res=> {
            let login_info=
            {
              access:res.data.access,
              refresh:res.data.refresh
            }
+          
            //성공시 토큰을 얻음
            //토큰을 헤더에 포함시켜 유저 정보 요청
           commit("login_success",login_info)
           window.location.href=('http://localhost:8080/main#/')
 
 
-          console.log(login_info)
-          // axios.post('',login_info)
-          // .then(response=>
-          //   {
-                //검증 결과를 통해 can_access 값 변경
-                // router push
-          // })
-          // .catch(error=>{})
           
          })
           .catch(err=> {

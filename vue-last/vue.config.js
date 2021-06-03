@@ -18,7 +18,11 @@ module.exports = {
   devServer: {
     proxy: {
       "/users": {
-        target: "http://localhost:8081/",
+        target: 'http://localhost:8081',
+        changeOrigin: true,
+      },
+      "/files": {
+        target: 'http://localhost:8081',
         changeOrigin: true,
       },
     }
