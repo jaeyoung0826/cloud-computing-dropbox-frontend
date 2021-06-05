@@ -34,7 +34,7 @@
         mdi-delete
       </v-icon>
        <v-icon
-    
+         @click="download_item(item)"
       >
         mdi-download
       </v-icon>
@@ -162,7 +162,8 @@ export default {
     {
 
       
-      this.content.push({day:res.data[i].modified_date.split('.')[0],file_name:res.data[i].file_name,index:i+1,star:res.data[i].is_starred})
+      this.content.push({day:res.data[i].modified_date.split('.')[0].split('T')[0]+" "+res.data[i].modified_date.split('.')[0].split('T')[1],
+                      file_name:res.data[i].file_name,index:i+1,star:res.data[i].is_starred})
       this.download_files[res.data[i].file_name]=res.data[i].file
       this.loading=true
     }
@@ -195,9 +196,9 @@ export default {
         fd.append("is_shared",this.user_files[item.index-1].is_shared)
         axios.delete("http://localhost:8000/files",fd)
         .then( res=> {console.log(res)})
-        .err(err=>{console.log(err)})
+        .catch(err=>{console.log(err)})
     },
-    test_item(item)
+    download_item(item)
     {
       let item_url="http://localhost:8000/"+item+"/download"
       axios.get(item_url,{file_name:item})

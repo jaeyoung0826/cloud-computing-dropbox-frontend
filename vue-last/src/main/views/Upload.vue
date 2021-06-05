@@ -97,7 +97,7 @@ export default {
         fd.append('file',this.files[i].file);
         fd.append("file_name",this.files[i].file.name)
         fd.append("is_shared",false)
-        fd.append("is_starred",true)
+        fd.append("is_starred",false)
 
     
         axios.post("http://localhost:8000/files",fd)

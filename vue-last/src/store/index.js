@@ -17,6 +17,7 @@ const store= new Vuex.Store({
     access: null,
     userid:null,
     refresh:null,
+    
   },
   
   getters: {},
