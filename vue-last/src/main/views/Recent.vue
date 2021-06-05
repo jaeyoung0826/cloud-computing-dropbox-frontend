@@ -72,7 +72,7 @@ export default {
   created()
   { 
     
-    axios.get("http://localhost:8081/myfile/recent")
+    axios.get("http://localhost:8000/myfile/recent")
     .then( res=> {this.user_files=res.data
     for(var i=0;i<res.data.length;i++)
     {
@@ -102,7 +102,7 @@ export default {
         fd.append("modified_date",this.user_files[item.index-1].modified_date)
         fd.append("user_id",this.user_files[item.index-1].user)
         fd.append("is_shared",this.user_files[item.index-1].is_shared)
-        axios.delete("http://localhost:8081/files",fd)
+        axios.delete("http://localhost:8000/files",fd)
         .then( res=> {console.log(res)})
         .err(err=>{console.log(err)})
     }

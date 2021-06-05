@@ -41,7 +41,7 @@ const store= new Vuex.Store({
     //토큰 재발급
     refresh_token({commit,state})
     {
-      axios.post("http://localhost:8081/users/login/refresh",{refresh:state.refresh})
+      axios.post("http://localhost:8000/users/login/refresh",{refresh:state.refresh})
       .then( res=> {commit("reset_token",res)
              console.log(res)       
      })
@@ -51,7 +51,7 @@ const store= new Vuex.Store({
    login({commit},signobj){
     {   
         commit("set_userid",signobj)
-        axios.post("http://localhost:8081/users/login/", {username:signobj.email_login,password:signobj.password_login})
+        axios.post("http://localhost:8000/users/login/", {username:signobj.email_login,password:signobj.password_login})
          .then( res=> {
            let login_info=
            {

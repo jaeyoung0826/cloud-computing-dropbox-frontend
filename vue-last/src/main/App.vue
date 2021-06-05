@@ -13,7 +13,7 @@
     <v-app-bar app>
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
-      <v-toolbar-title>Application</v-toolbar-title>
+      <v-toolbar-title>KHU-BOX</v-toolbar-title>
     </v-app-bar>
      <v-navigation-drawer 
      v-model="drawer"
@@ -28,7 +28,10 @@
       </v-list-item>
 
       <v-divider></v-divider>
-      <v-btn elevation="2" fab x-large></v-btn> <!--파일 업로드 버튼-->
+      <div class="user-profile">
+      <v-btn elevation="2" fab x-large padding:30px></v-btn> <!--유저 모습-->
+      {{user_id}}
+      </div>
       <v-list
         dense
         nav
@@ -58,6 +61,7 @@
 </template>
 
 <script>
+import store from '../store'
 import Upload from './views/Page.vue'
   export default {
     components:
@@ -66,15 +70,28 @@ import Upload from './views/Page.vue'
       
     }
     ,
+    methods:
+    {
+      
+    }
+    ,
     data: () => ({ 
     drawer: null,
     items: [
-          { title: 'image', icon: 'mdi-clock-time-four ', to:'/main'},
           { title: '중요문서함', icon: 'mdi-star',to:'/Star'},
-          { title: '최근문서함', icon: 'mdi-help-box',to:'/about' },
-          { title: '문서함', icon: 'mdi-help-box',to:'/test' },
+          { title: '최근문서함', icon: 'mdi-clock-time-four',to:'/about' },
+          { title: '문서함', icon: 'mdi-file-document',to:'/test' },
           
         ],
+     user_id: store.state.userid
         }),
+   
   }
 </script>
+<style scoped>
+user_profile.user_id 
+{
+  padding: 30px;
+}
+
+</style>

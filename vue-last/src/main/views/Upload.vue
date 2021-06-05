@@ -100,7 +100,7 @@ export default {
         fd.append("is_starred",true)
 
     
-        axios.post("http://localhost:8081/files",fd)
+        axios.post("http://localhost:8000/files",fd)
          .then( res=> {
            console.log(res)
            alert("업로드 완료")

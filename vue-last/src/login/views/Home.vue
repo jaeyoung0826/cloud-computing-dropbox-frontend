@@ -80,7 +80,7 @@
                             color="teal accent-3"
                             single-line
                             outlined
-                            v-model="form.first_name"
+                            v-model="first_name"
                           />
                           </div>
                           <div style="width:100px">
@@ -94,7 +94,7 @@
                             color="teal accent-3"
                             single-line
                             outlined  
-                            v-model="form.last_name"
+                            v-model="last_name"
                           />
                           </div>
                           </v-row>
@@ -106,7 +106,7 @@
                             prepend-icon="person"
                             type="text"
                             color="teal accent-3"
-                            v-model="form.username"
+                            v-model="username"
                             single-line
                             outlined  
                           />
@@ -118,7 +118,7 @@
                             color="teal accent-3"
                             single-line
                             outlined  
-                            v-model="form.email"
+                            v-model="email"
                           />
                           </div>
                           
@@ -135,7 +135,7 @@
                             color="teal accent-3"
                             single-line
                             outlined  
-                            v-model="form.password"
+                            v-model="password"
                           />
                           </div>
 
@@ -151,7 +151,7 @@
                             color="teal accent-3"
                             single-line
                             outlined
-                            v-model="form.check_password"                            
+                            v-model="check_password"                            
                           />
                           </div>
                           </v-row>
@@ -189,18 +189,8 @@ import {mapActions} from "vuex"
 export default {
   data: () => ({
     step: 1,
-    form: {
-        username: '',
-        email: '',
-        password:'',
-        check_password:'',
-        first_name:'',
-        last_name:''
-    },
-    login_form:{
-      email:'',
-      password:''
-    },
+    email:'',
+    password:'',
     iserror:false
   }),
   props: {
@@ -209,18 +199,19 @@ export default {
    
     methods:{
       postdata(){
-        console.log( this.form),
         this.cleartxt(),
         this.iserror=true,
-        axios.post('/users', {
-        username: this.form.username,
-        email: this.form.email,
-        password:this.for.password,
+        axios.post('http://localhost:8000/users/', {
+        username: this.username,
+        email: this.email,
+        password:this.password,
         check_password:this.check_password,
         first_name:this.first_name,
         last_name:this.last_name
         }).then(function (response) {
           console.log(response);
+          this.iserror=true,
+          window.location.reload()
         })
         .catch(function (error) {
         console.log(error);
