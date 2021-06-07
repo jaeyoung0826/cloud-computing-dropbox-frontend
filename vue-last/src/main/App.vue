@@ -226,7 +226,7 @@ export default {
       logout(){ router.go(-window.history.length+1)},
       profile_dialog_on(){this.profile_dialog=true},
       edit_profile(item){
-        axios.put("http://localhost:8000/users/profile/"+this.user_id,
+        axios.put("http://api.drive.jinsu.me/users/profile/"+this.user_id,
         {    
           username: item.edit_username,
           email: item.edit_email,
@@ -246,7 +246,7 @@ export default {
       }
       ,
       edit_password(item){
-        axios.put("http://localhost:8000/users/password/"+this.user_id,
+        axios.put("http://api.drive.jinsu.me/users/password/"+this.user_id,
         {    
           password: item.new_password,
           password2: item.check_new_password,
@@ -270,6 +270,7 @@ export default {
     profile_dialog:false,
     password_dialog:false,
     items: [
+          { title: '공유문서함',icon:'mdi-account-group',to:'/Share'},
           { title: '중요문서함', icon: 'mdi-star',to:'/Star'},
           { title: '최근문서함', icon: 'mdi-clock-time-four',to:'/about' },
           { title: '문서함', icon: 'mdi-file-document',to:'/test' },

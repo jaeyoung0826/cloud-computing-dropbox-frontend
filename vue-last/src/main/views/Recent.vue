@@ -29,11 +29,23 @@
         mdi-star-outline
       </v-icon>
     </template>
+    <template v-slot:item.Share="{item}">
+      <v-icon v-if="item.Share"
+        class="mr-2"
+      >
+        mdi-account-group
+      </v-icon>
+      <v-icon v-else
+        class="mr-2"
+      >
+        mdi-account-group-outline
+      </v-icon>
+    </template>
       <template v-slot:item.actions="{item}">
       <v-icon
         
         class="mr-2"
-        @click="test_item(item.file_name)"
+        @click="openDialog_edit(item.file_name)"
       >
         mdi-pencil
       </v-icon>
@@ -51,7 +63,70 @@
       </v-icon>
     </template>
   </v-data-table>
-  
+       <v-dialog
+      v-model="edit_dialog"
+      persistent
+      max-width="600px"
+    >
+
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">파일 수정</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field
+                  label="파일명*"
+                  type="text"
+                  required
+                  v-model="edit_file_name"
+                ></v-text-field>
+              </v-col>
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-autocomplete
+                  :items="['YES','NO']"
+                  label="공유 여부"
+                  v-model="share"
+                ></v-autocomplete>
+              </v-col>
+              <v-col
+                cols="12"
+                sm="6"
+              >
+                <v-autocomplete
+                  :items="['YES','NO']"
+                  label="중요 문서"
+                  v-model="star"
+                  
+                ></v-autocomplete>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="edit_dialog= false"
+          >
+            Close
+          </v-btn>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="edit_post({star,share,edit_file_name}),edit_dialog = false"
+          >
+            Save
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 </v-card>
 </template>
 
@@ -62,13 +137,20 @@
 //import delete_icon from "../../components/BtnFunction"
 import {mapState} from "vuex"
 import axios from "axios"
+import router from '../router'
+
 import store from "../../store"
 axios.defaults.headers.common = {'Authorization': `Bearer ${store.state.access}`}
 
 export default {
   data: () => ({
+    origin_file_name:'',
+    star:false,
+    edit_file_name:'',
+    share:false,
     step: 1,
     access:mapState.access,
+    edit_dialog: false,
     search:'',
     user_files:[],
     download_files:[],
@@ -76,6 +158,7 @@ export default {
     headers: [
         { text: '날짜', value: 'day', sortable: true, class: 'hidden-sm-and-down' },
         { text: '제목', value: 'file_name', sortable: true },
+        { text: '공유여부', value:'Share',sortable:true},
         { text: '중요문서', value:'star',sortable:true},
         { text: 'Actions', value: 'actions', sortable: false },
 
@@ -84,13 +167,13 @@ export default {
   created()
   { 
     
-    axios.get("http://localhost:8000/myfile/recent")
+    axios.get("http://api.drive.jinsu.me/myfile/recent")
     .then( res=> {this.user_files=res.data
     for(var i=0;i<res.data.length;i++)
     {
 
         this.content.push({day:res.data[i].modified_date.split('.')[0].split('T')[0]+" "+res.data[i].modified_date.split('.')[0].split('T')[1],
-        file_name:res.data[i].file_name,star:res.data[i].is_starred})
+        file_name:res.data[i].file_name,star:res.data[i].is_starred,Share:res.data[i].is_shared})
         this.download_files[res.data[i].file_name]=res.data[i].file
     }
     
@@ -100,10 +183,14 @@ export default {
   ,
   methods:
   {
-   
-    test_item(item)
+    openDialog_edit(item){this.edit_dialog=true, this.origin_file_name=item},
+    closeDialog_edit() { this.edit_dialog = false;},
+    edit_post(item)
     {
-        console.log(this.download_files[item])
+      axios.put("http://api.drive.jinsu.me/myfile/update/"+this.origin_file_name, 
+      {file_name:item.edit_file_name, is_shared:item.share,is_starred:item.star})
+      .then(res=>{console.log(res), router.go()})
+      .catch(err=>{console.log(err)})
     }
     ,
     delete_item(item)
@@ -115,7 +202,7 @@ export default {
         fd.append("modified_date",this.user_files[item.index-1].modified_date)
         fd.append("user_id",this.user_files[item.index-1].user)
         fd.append("is_shared",this.user_files[item.index-1].is_shared)
-        axios.delete("http://localhost:8000/files",fd)
+        axios.delete("http://api.drive.jinsu.me/files",fd)
         .then( res=> {console.log(res)})
         .err(err=>{console.log(err)})
     }

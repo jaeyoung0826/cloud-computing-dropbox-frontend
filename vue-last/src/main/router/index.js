@@ -22,10 +22,26 @@ const routes = [
         router.go(-1)
       }
       
-  }
-  
-
+    }
   },
+  {
+    path: '/Share',
+    name: 'Share',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Share.vue'),
+    beforeEnter: (to, from, next) => 
+    {
+      if(store.state.access!=null)
+      {
+        next()
+      }
+      else{
+        alert("비정상적인 접근입니다!")
+        router.go(-1)
+      }
+      
+    }
+  }
+  ,
   {
     path: '/main',
     name: 'main',
@@ -38,7 +54,7 @@ const routes = [
       }
       else{
         alert("비정상적인 접근입니다!")
-        router.gozz(-1)
+        router.go(-1)
       }
       
   }

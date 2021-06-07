@@ -197,7 +197,7 @@ export default {
     methods:{
       postdata(){
         this.cleartxt(),
-        axios.post('http://localhost:8000/users/', {
+        axios.post('http://api.drive.jinsu.me/users/', {
         username: this.username,
         email: this.email,
         password:this.password,
