@@ -1,7 +1,7 @@
 <template>
 <v-card>
 <v-card-title>
-      중요문서함
+      휴지통
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
@@ -16,7 +16,6 @@
       :items="content"
       :search="search"
       class="elevation-1"
-      loading=true
   >
    <template v-slot:item.star="{item}">
       <v-icon v-if="item.star"
@@ -30,7 +29,8 @@
         mdi-star-outline
       </v-icon>
     </template>
-        <template v-slot:item.Share="{item}">
+
+     <template v-slot:item.Share="{item}">
       <v-icon v-if="item.Share"
         class="mr-2"
       >
@@ -50,13 +50,7 @@
       >
         mdi-pencil
       </v-icon>
-      <v-icon
-    
-        class="mr-2"
-         @click="delete_item(item)"
-      >
-        mdi-delete
-      </v-icon>
+      
        <v-icon
         @click="download_item(item)"
       >
@@ -64,7 +58,7 @@
       </v-icon>
     </template>
   </v-data-table>
-   <v-dialog
+     <v-dialog
       v-model="edit_dialog"
       persistent
       max-width="600px"
@@ -139,42 +133,41 @@
 import {mapState} from "vuex"
 import axios from "axios"
 import store from "../../store"
-import router from '../router'
+import router from "../router"
 axios.defaults.headers.common = {'Authorization': `Bearer ${store.state.access}`}
 
 export default {
   data: () => ({
     origin_file_name:'',
-     star:false,
+    star:false,
     edit_file_name:'',
-    share:false,
+   share:false,
     step: 1,
-    loading:true,
+    edit_dialog: false,
     access:mapState.access,
     search:'',
     user_files:[],
-    edit_dialog: false,
     download_files:[],
     content: [],
     headers: [
-        
         { text: '날짜', value: 'day', sortable: true, class: 'hidden-sm-and-down' },
         { text: '제목', value: 'file_name', sortable: true },
-         { text: '공유여부', value:'Share',sortable:true},
+        { text: '공유여부', value:'Share',sortable:true},
         { text: '중요문서', value:'star',sortable:true},
         { text: 'Actions', value: 'actions', sortable: false },
 
       ],
   }),
   created()
-  {
-    axios.get("http://localhost:8000/myfile/starred")
+  { 
+    
+    axios.get("http://localhost:8000/trash")
     .then( res=> {this.user_files=res.data
     for(var i=0;i<res.data.length;i++)
     {
-
-        this.content.push({day:res.data[i].modified_date.split('.')[0].split('T')[0]+" "+res.data[i].modified_date.split('.')[0].split('T')[1]
-        ,file_name:res.data[i].file_name,star:res.data[i].is_starred,Share:res.data[i].is_shared})
+        
+        this.content.push({day:res.data[i].modified_date.split('.')[0].split('T')[0]+" "+res.data[i].modified_date.split('.')[0].split('T')[1],
+        file_name:res.data[i].file_name,star:res.data[i].is_starred,Share:res.data[i].is_shared})
         this.download_files[res.data[i].file_name]=res.data[i].file
     }
     
@@ -189,16 +182,16 @@ export default {
     edit_post(item)
     {
       axios.put("http://localhost:8000/myfile/update/"+this.origin_file_name, 
-      {file_name:item.edit_file_name, is_shared:item.share, is_starred:item.star})
+      {file_name:item.edit_file_name, is_shared:item.share,is_starred:item.star})
       .then(res=>{console.log(res), router.go()})
       .catch(err=>{console.log(err)})
     }
     ,
     delete_item(item)
     {
-        let tmp=this.user_files[item.con_index].file_name
+        console.log(this.user_files[item.index-1])
         var fd = new FormData();
-        fd.append('file',this.download_files[tmp]);
+        fd.append('file',this.user_files[item.index-1].file);
         fd.append("file_name",this.user_files[item.index-1].name)
         fd.append("modified_date",this.user_files[item.index-1].modified_date)
         fd.append("user_id",this.user_files[item.index-1].user)
@@ -206,22 +199,25 @@ export default {
         axios.delete("http://localhost:8000/files",fd)
         .then( res=> {console.log(res)})
         .err(err=>{console.log(err)})
-    },
-       download_item(item)
+    }
+  },
+     download_item(item)
     {
       
       let item_url="http://localhost:8000/"+item.file_name+"/download"
       axios.get(item_url,{file_name:item})
-      .then(response=>{const url = window.URL.createObjectURL(new Blob([response.data.Body], { type: 'text/plain' }))
+      .then(response=>{
+                console.log(response)
+                console.log("gii")
+                const url = window.URL.createObjectURL(new Blob([response.data.Body], { type: 'text/plain' }))
                 const link = document.createElement('a')
                 link.href = url
                 console.log(link)
                 link.setAttribute('download', item.file_name)
                 document.body.appendChild(link)
                 link.click()})
-      .then(err=>{console.log(err)})
+      .then(err=>{console.log(err),alert(err)})
     }
-  }
 
     
 };

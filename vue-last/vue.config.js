@@ -18,11 +18,11 @@ module.exports = {
   devServer: {
     proxy: {
       "/users": {
-        target: 'http://api.drive.jinsu.me',
+        target: 'http://localhost:8000',
         changeOrigin: true,
       },
       "/files": {
-        target: 'http://api.drive.jinsu.me',
+        target: 'http://localhost:8000',
         changeOrigin: true,
       },
     }

@@ -57,7 +57,7 @@
         mdi-delete
       </v-icon>
        <v-icon
-    
+      @click="download_item(item)"
       >
         mdi-download
       </v-icon>
@@ -137,6 +137,103 @@
 //import delete_icon from "../../components/BtnFunction"
 import {mapState} from "vuex"
 import axios from "axios"
+import store from "../../store"
+import router from '../router'
+axios.defaults.headers.common = {'Authorization': `Bearer ${store.state.access}`}
+
+export default {
+  data: () => ({
+   star:false,
+   edit_file_name:'',
+   share:false,
+   edit_dialog: false,
+    loading:true,
+    step: 1,
+    access:mapState.access,
+    search:'',
+    origin_file_name:'',
+    user_files:[],
+    download_files:[],
+    content: [],
+    headers: [
+        { text: '날짜', value: 'day', sortable: true, class: 'hidden-sm-and-down' },
+        { text: '제목', value: 'file_name', sortable: true },
+        { text: '공유여부', value:'Share',sortable:true},
+        { text: '중요문서', value:'star',sortable:true},
+        { text: 'Actions', value: 'actions', sortable: false },
+        
+
+      ],
+  }),
+  created()
+  {
+    axios.get("http://localhost:8000/myfile/recent")
+    .then( res=> {this.user_files=res.data
+    console.log(res.data.length)
+    for(var i=0;i<res.data.length;i++)
+    {
+
+      
+      this.content.push({day:res.data[i].modified_date.split('.')[0].split('T')[0]+" "+res.data[i].modified_date.split('.')[0].split('T')[1],
+                      file_name:res.data[i].file_name,index:i+1,star:res.data[i].is_starred,Share:res.data[i].is_shared,con_index:i})
+      this.download_files[res.data[i].file_name]=res.data[i].file
+      this.loading=true
+    }
+    
+    })
+    .catch(err=>{console.log(err)})
+  }
+  ,
+  methods:
+  {
+    edit_post(item)
+    {
+      axios.put("http://localhost:8000/myfile/update/"+this.origin_file_name, 
+      {file_name:item.edit_file_name, is_shared:item.share,is_starred:item.star})
+      .then(res=>{console.log(res), router.go()})
+      .catch(err=>{console.log(err)})
+    }
+    ,
+    openDialog_edit(item){this.edit_dialog=true, this.origin_file_name=item},
+    closeDialog_edit() { this.edit_dialog = false;},
+
+    delete_item(item)
+    {
+        let tmp=this.user_files[item.con_index].file_name
+        var fd = new FormData();
+        fd.append('file',this.download_files[tmp]);
+        console.log(tmp)
+        console.log(this.download_files[tmp])
+        fd.append("file_name",this.user_files[item.con_index].file_name)
+        fd.append("modified_date",this.user_files[item.con_index].modified_date)
+        fd.append("user_id",this.user_files[item.con_index].user)
+        fd.append("is_shared",this.user_files[item.con_index].is_shared)
+        axios.post("http://localhost:8000/trash",fd)
+        .then( res=> {console.log(res),router.go()})
+        .catch(err=>{console.log(err)})
+    },
+    download_item(item)
+    {
+      
+      let item_url="http://localhost:8000/"+item.file_name+"/download"
+      axios.get(item_url,{file_name:item})
+         .then(response=>{const url = window.URL.createObjectURL(new Blob([response.data.Body], { type: 'text/plain' }))
+                const link = document.createElement('a')
+                link.href = url
+                console.log(link)
+                link.setAttribute('download', item.file_name)
+                document.body.appendChild(link)
+                link.click()})
+      .then(err=>{console.log(err)})
+    }
+  }
+
+    
+};
+</script><script>
+//import delete_icon from "../../components/BtnFunction"
+import {mapState} from "vuex"
+import axios from "axios"
 import router from '../router'
 
 import store from "../../store"
@@ -154,6 +251,7 @@ export default {
     search:'',
     user_files:[],
     download_files:[],
+    
     content: [],
     headers: [
         { text: '날짜', value: 'day', sortable: true, class: 'hidden-sm-and-down' },
@@ -167,13 +265,12 @@ export default {
   created()
   { 
     
-    axios.get("http://api.drive.jinsu.me/myfile/recent")
+    axios.get("http://localhost:8000/myfile/recent")
     .then( res=> {this.user_files=res.data
     for(var i=0;i<res.data.length;i++)
     {
-
         this.content.push({day:res.data[i].modified_date.split('.')[0].split('T')[0]+" "+res.data[i].modified_date.split('.')[0].split('T')[1],
-        file_name:res.data[i].file_name,star:res.data[i].is_starred,Share:res.data[i].is_shared})
+        file_name:res.data[i].file_name,star:res.data[i].is_starred,Share:res.data[i].is_shared,index:i})
         this.download_files[res.data[i].file_name]=res.data[i].file
     }
     
@@ -183,28 +280,44 @@ export default {
   ,
   methods:
   {
-    openDialog_edit(item){this.edit_dialog=true, this.origin_file_name=item},
+    openDialog_edit(item){this.edit_dialog= true, this.origin_file_name=item},
     closeDialog_edit() { this.edit_dialog = false;},
     edit_post(item)
     {
-      axios.put("http://api.drive.jinsu.me/myfile/update/"+this.origin_file_name, 
+      axios.put("http://localhost:8000/myfile/update/"+this.origin_file_name, 
       {file_name:item.edit_file_name, is_shared:item.share,is_starred:item.star})
       .then(res=>{console.log(res), router.go()})
       .catch(err=>{console.log(err)})
     }
     ,
-    delete_item(item)
+  delete_item(item)
     {
-        console.log(this.user_files[item.index-1])
+        let tmp=this.user_files[item.con_index].file_name
         var fd = new FormData();
-        fd.append('file',this.user_files[item.index-1].file);
-        fd.append("file_name",this.user_files[item.index-1].name)
-        fd.append("modified_date",this.user_files[item.index-1].modified_date)
-        fd.append("user_id",this.user_files[item.index-1].user)
-        fd.append("is_shared",this.user_files[item.index-1].is_shared)
-        axios.delete("http://api.drive.jinsu.me/files",fd)
-        .then( res=> {console.log(res)})
-        .err(err=>{console.log(err)})
+        fd.append('file',this.download_files[tmp]);
+        console.log(tmp)
+        console.log(this.download_files[tmp])
+        fd.append("file_name",this.user_files[item.con_index].file_name)
+        fd.append("modified_date",this.user_files[item.con_index].modified_date)
+        fd.append("user_id",this.user_files[item.con_index].user)
+        fd.append("is_shared",this.user_files[item.con_index].is_shared)
+        axios.post("http://localhost:8000/trash",fd)
+        .then( res=> {console.log(res),router.go()})
+        .catch(err=>{console.log(err)})
+    },
+       download_item(item)
+    {
+      
+      let item_url="http://localhost:8000/"+item.file_name+"/download"
+      axios.get(item_url,{file_name:item})
+      .then(response=>{const url = window.URL.createObjectURL(new Blob([response.data.Body], { type: 'text/plain' }))
+                const link = document.createElement('a')
+                link.href = url
+                console.log(link)
+                link.setAttribute('download', item.file_name)
+                document.body.appendChild(link)
+                link.click()})
+      .then(err=>{console.log(err)})
     }
   }
 

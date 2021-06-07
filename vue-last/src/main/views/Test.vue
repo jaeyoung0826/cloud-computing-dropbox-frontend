@@ -168,7 +168,7 @@ export default {
   }),
   created()
   {
-    axios.get("http://api.drive.jinsu.me/files")
+    axios.get("http://localhost:8000/files")
     .then( res=> {this.user_files=res.data
     console.log(res.data.length)
     for(var i=0;i<res.data.length;i++)
@@ -176,7 +176,7 @@ export default {
 
       
       this.content.push({day:res.data[i].modified_date.split('.')[0].split('T')[0]+" "+res.data[i].modified_date.split('.')[0].split('T')[1],
-                      file_name:res.data[i].file_name,index:i+1,star:res.data[i].is_starred,Share:res.data[i].is_shared})
+                      file_name:res.data[i].file_name,index:i+1,star:res.data[i].is_starred,Share:res.data[i].is_shared,con_index:i})
       this.download_files[res.data[i].file_name]=res.data[i].file
       this.loading=true
     }
@@ -189,7 +189,7 @@ export default {
   {
     edit_post(item)
     {
-      axios.put("http://api.drive.jinsu.me/myfile/update/"+this.origin_file_name, 
+      axios.put("http://localhost:8000/myfile/update/"+this.origin_file_name, 
       {file_name:item.edit_file_name, is_shared:item.share,is_starred:item.star})
       .then(res=>{console.log(res), router.go()})
       .catch(err=>{console.log(err)})
@@ -200,23 +200,25 @@ export default {
 
     delete_item(item)
     {
-        
+        let tmp=this.user_files[item.con_index].file_name
         var fd = new FormData();
-        fd.append('file',this.user_files[item.index-1].file);
-        fd.append("file_name",this.user_files[item.index-1].name)
-        fd.append("modified_date",this.user_files[item.index-1].modified_date)
-        fd.append("user_id",this.user_files[item.index-1].user)
-        fd.append("is_shared",this.user_files[item.index-1].is_shared)
-        axios.delete("http://api.drive.jinsu.me/files",fd)
-        .then( res=> {console.log(res)})
+        fd.append('file',this.download_files[tmp]);
+        console.log(tmp)
+        console.log(this.download_files[tmp])
+        fd.append("file_name",this.user_files[item.con_index].file_name)
+        fd.append("modified_date",this.user_files[item.con_index].modified_date)
+        fd.append("user_id",this.user_files[item.con_index].user)
+        fd.append("is_shared",this.user_files[item.con_index].is_shared)
+        axios.post("http://localhost:8000/trash",fd)
+        .then( res=> {console.log(res),router.go()})
         .catch(err=>{console.log(err)})
     },
     download_item(item)
     {
       
-      let item_url="http://api.drive.jinsu.me/"+item.file_name+"/download"
+      let item_url="http://localhost:8000/"+item.file_name+"/download"
       axios.get(item_url,{file_name:item})
-      .then(response=>{const url = window.URL.createObjectURL(new Blob([response.data.Body], { type: 'text/plain' }))
+         .then(response=>{const url = window.URL.createObjectURL(new Blob([response.data.Body], { type: 'text/plain' }))
                 const link = document.createElement('a')
                 link.href = url
                 console.log(link)

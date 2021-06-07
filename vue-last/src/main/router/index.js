@@ -43,6 +43,24 @@ const routes = [
   }
   ,
   {
+    path: '/Trash',
+    name: 'Trash',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Trash.vue'),
+    beforeEnter: (to, from, next) => 
+    {
+      if(store.state.access!=null)
+      {
+        next()
+      }
+      else{
+        alert("비정상적인 접근입니다!")
+        router.go(-1)
+      }
+      
+    }
+  }
+  ,
+  {
     path: '/main',
     name: 'main',
     component: () => import(/* webpackChunkName: "about" */ '../views/main_view.vue'),
