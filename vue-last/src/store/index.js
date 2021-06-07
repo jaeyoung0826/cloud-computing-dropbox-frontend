@@ -40,6 +40,11 @@ const store= new Vuex.Store({
   },
   actions: {
     //토큰 재발급
+    do_reset_token({commit})
+    {
+      commit("reset_token",'')
+    }
+    ,
     refresh_token({commit,state})
     {
       axios.post("http://localhost:8000/users/login/refresh",{refresh:state.refresh})

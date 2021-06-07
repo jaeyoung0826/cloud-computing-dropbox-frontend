@@ -200,9 +200,17 @@ export default {
     },
     download_item(item)
     {
-      let item_url="http://localhost:8000/"+item+"/download"
+      
+      let item_url="http://localhost:8000/"+item.file_name+"/download"
       axios.get(item_url,{file_name:item})
-      .then(res=>{console.log(res)})
+      .then(response=>{const url = window.URL.createObjectURL(new Blob([response.data.Body], { type: 'text/plain' }))
+                const link = document.createElement('a')
+                link.href = url
+                const filename = url.replaceAll(decodeURI(response.headers.filename), '+', ' ')
+                link.setAttribute('download', filename)
+                //link.setContentDispositionFormData("attachment", file_Name);
+                document.body.appendChild(link)
+                link.click()})
       .then(err=>{console.log(err)})
     }
   }

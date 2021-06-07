@@ -45,7 +45,7 @@
                     </v-col>
                     <v-col cols="12" md="4" class="teal accent-3">
                       <v-card-text class="white--text mt-12">
-                        <h1 class="text-center display-1">아이디가 없다면?</h1>
+                        <h1 class="text-center display-1">계정이 없다면?</h1>
                       </v-card-text>
                       <div class="text-center">
                         <v-btn rounded outlined dark @click="step++">SIGN UP</v-btn>
@@ -68,11 +68,10 @@
                       <v-card-text class="mt-12">
                         <h1 class="text-center display-2 teal--text text--accent-3 heightset "  >Create Account</h1>
                         <v-form>
+                          <v-col>
                           <v-row>
-                          <div style="width:10px">
-                          </div>
-                          <div style="width:200px">
                           <v-text-field
+                           
                             label="first_Name"
                             name="first_Name"
                             prepend-icon="person"
@@ -82,34 +81,28 @@
                             outlined
                             v-model="first_name"
                           />
-                          </div>
-                          <div style="width:100px">
-                          </div>
-                          <div style="width:200px">
+                          <v-spacer></v-spacer>
                           <v-text-field
                             label="last_Name"
                             name="last_Name"
-                            prepend-icon="person"
                             type="text"
                             color="teal accent-3"
                             single-line
                             outlined  
                             v-model="last_name"
                           />
-                          </div>
-                          </v-row>
-                          
-                          <div style="width:500px">
+                          <v-spacer></v-spacer>
                           <v-text-field
                             label="Id"
                             name="ID"
-                            prepend-icon="person"
                             type="text"
                             color="teal accent-3"
                             v-model="username"
                             single-line
                             outlined  
                           />
+                          </v-row>
+                          <v-row>
                           <v-text-field
                             label="Email"
                             name="Email"
@@ -120,12 +113,9 @@
                             outlined  
                             v-model="email"
                           />
-                          </div>
-                          
+                          </v-row>
+
                           <v-row>
-                          <div style="width:10px">
-                          </div>
-                          <div style="width:200px">
                           <v-text-field
                             id="password"
                             label="Password"
@@ -137,11 +127,9 @@
                             outlined  
                             v-model="password"
                           />
-                          </div>
+                          </v-row>
 
-                          <div style="width:100px"></div>
-
-                          <div style="width:200px">
+                          <v-row>
                           <v-text-field
                             id="check-password"
                             label="check-Password"
@@ -153,12 +141,20 @@
                             outlined
                             v-model="check_password"                            
                           />
-                          </div>
                           </v-row>
+                          </v-col>
                         
                         </v-form>
                       </v-card-text>
+                    
+
                       <v-alert
+                         :value="signup_error"
+                         type="error"
+                      >
+                      가입 실패!
+                      </v-alert>
+                        <v-alert
                         :value="iserror"
                         type="success"
                       >
@@ -191,7 +187,8 @@ export default {
     step: 1,
     email:'',
     password:'',
-    iserror:false
+    iserror:false,
+    signup_error:false
   }),
   props: {
     source: String
@@ -200,7 +197,6 @@ export default {
     methods:{
       postdata(){
         this.cleartxt(),
-        this.iserror=true,
         axios.post('http://localhost:8000/users/', {
         username: this.username,
         email: this.email,
@@ -210,15 +206,18 @@ export default {
         last_name:this.last_name
         }).then(function (response) {
           console.log(response);
-          this.iserror=true,
+          alert("가입완료")
           window.location.reload()
         })
-        .catch(function (error) {
-        console.log(error);
+        .catch(error=> {
+        console.log(error.response.data),
+        this.iserror=false,
+        this.signup_error=true;
          });
-        },
+      },
       cleartxt(){this.form='', this.password_login=''},
       ...mapActions(["login"]),
+      
       // test(signobj)
       // {
       //   axios.post('https://reqres.in/api/register', signobj)

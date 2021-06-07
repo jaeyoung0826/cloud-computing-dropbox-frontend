@@ -14,6 +14,8 @@
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
       <v-toolbar-title>KHU-BOX</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn @click="logout(), do_reset_token"> Log out </v-btn>
     </v-app-bar>
      <v-navigation-drawer 
      v-model="drawer"
@@ -207,8 +209,10 @@
 
 <script>
 import axios from 'axios'
-import store from '../store'
 import Upload from './views/Page.vue'
+import router from '../main/router'
+import store from '../store'
+import { mapActions } from 'vuex'
 export default {
     components:
     {
@@ -218,6 +222,8 @@ export default {
     ,
     methods:
     {
+      ...mapActions["do_reset_token"],
+      logout(){ router.go(-window.history.length+1)},
       profile_dialog_on(){this.profile_dialog=true},
       edit_profile(item){
         axios.put("http://localhost:8000/users/profile/"+this.user_id,

@@ -38,7 +38,7 @@ const routes = [
       }
       else{
         alert("비정상적인 접근입니다!")
-        router.go(-1)
+        router.gozz(-1)
       }
       
   }
