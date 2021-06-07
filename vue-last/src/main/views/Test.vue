@@ -206,9 +206,8 @@ export default {
       .then(response=>{const url = window.URL.createObjectURL(new Blob([response.data.Body], { type: 'text/plain' }))
                 const link = document.createElement('a')
                 link.href = url
-                const filename = url.replaceAll(decodeURI(response.headers.filename), '+', ' ')
-                link.setAttribute('download', filename)
-                //link.setContentDispositionFormData("attachment", file_Name);
+                console.log(link)
+                link.setAttribute('download', item.file_name)
                 document.body.appendChild(link)
                 link.click()})
       .then(err=>{console.log(err)})
