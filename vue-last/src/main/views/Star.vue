@@ -53,7 +53,7 @@
       <v-icon
     
         class="mr-2"
-         @click="delete_item(item)"
+         @click="on_delete_dialog(item)"
       >
         mdi-delete
       </v-icon>
@@ -128,6 +128,15 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog
+     v-model="delete_dialog"
+      persistent
+      max-width="600px"
+    >
+      <v-btn @click=Permanently_delete(tmp_delete_file)>영구삭제</v-btn>
+      <v-btn @click= delete_item(tmp_delete_file)>휴지통으로 이동</v-btn>
+      <v-btn @click="delete_dialog= false"> 취소</v-btn>
+    </v-dialog>
 </v-card>
 </template>
 
@@ -155,6 +164,8 @@ export default {
     user_files:[],
     edit_dialog: false,
     download_files:[],
+    delete_dialog:false,
+    tmp_delete_file:"",
     content: [],
     headers: [
         
@@ -168,7 +179,7 @@ export default {
   }),
   created()
   {
-    axios.get("http://localhost:8000/myfile/starred")
+    axios.get("http://api.drive.jinsu.me/myfile/starred")
     .then( res=> {this.user_files=res.data
     for(var i=0;i<res.data.length;i++)
     {
@@ -184,11 +195,25 @@ export default {
   ,
   methods:
   {
+    Permanently_delete(item)
+    {
+      console.log(item)
+      axios.delete("http://api.drive.jinsu.me/myfile/delete/"+item.file_name)
+      .then(res=>{console.log(res),router.go()})
+      .catch(err=>{console.log(err)})
+    }
+    ,
+    on_delete_dialog(item)
+    {
+      this.tmp_delete_file=item
+      this.delete_dialog=true;
+    }
+    ,
     openDialog_edit(item){this.edit_dialog=true, this.origin_file_name=item},
     closeDialog_edit() { this.edit_dialog = false;},
     edit_post(item)
     {
-      axios.put("http://localhost:8000/myfile/update/"+this.origin_file_name, 
+      axios.put("http://api.drive.jinsu.me/myfile/update/"+this.origin_file_name, 
       {file_name:item.edit_file_name, is_shared:item.share, is_starred:item.star})
       .then(res=>{console.log(res), router.go()})
       .catch(err=>{console.log(err)})
@@ -203,14 +228,14 @@ export default {
         fd.append("modified_date",this.user_files[item.index-1].modified_date)
         fd.append("user_id",this.user_files[item.index-1].user)
         fd.append("is_shared",this.user_files[item.index-1].is_shared)
-        axios.delete("http://localhost:8000/files",fd)
+        axios.delete("http://api.drive.jinsu.me/files",fd)
         .then( res=> {console.log(res)})
         .err(err=>{console.log(err)})
     },
        download_item(item)
     {
       
-      let item_url="http://localhost:8000/"+item.file_name+"/download"
+      let item_url="http://api.drive.jinsu.me/"+item.file_name+"/download"
       axios.get(item_url,{file_name:item})
       .then(response=>{const url = window.URL.createObjectURL(new Blob([response.data.Body], { type: 'text/plain' }))
                 const link = document.createElement('a')
